@@ -1,42 +1,72 @@
 const getState = ({ getStore, getActions, setStore }) => {
+	const apiURL = "https://playground.4geeks.com/contact"
+	const slug = "emanueldelc"
+	
+	
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			contacts: []
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			getContacts: async () => {
+				let response = await fetch(`${apiURL}/agendas/${slug}/contacts`)
+				if(response.status==404){
+					console.log("Agenda with slug not found. A new one is being created")
+					getActions().createAgenda()
+				} else if(response.status==200){
+					let data=await response.json()
+					console.log(data)
+					setStore({contacts: data.contacts})
+				} else{
+					console.log("error occurred while getting your contacts", response.statusText, response.status)
+					alert("error occured while getting your contacts. Please try again later")
+				} 
 			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+			createAgenda: async () => {
+				let response = await fetch(`${apiURL}/agendas/${slug}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					}
+				})
+				if(response.status==201){
+					console.log("Succesfully created new agenda. Getting contacts")
+					getActions().getContacts()
+				} else{
+					console.log("error occurred while getting your contacts", response.statusText, response.status)
+					alert("error occured while creating your Agenda. Please try again later")
+				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+			addContact: async (formData) => {
+				let response = await fetch(`${apiURL}/agendas/${slug}/contacts`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({
+						email: formData.email,
+						phone: formData.phone,
+						name: formData.name,
+						address: formData.address
+					})
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+					
+				})
+				if(response.status==201){
+					console.log("Succesfully added new contact")
+					getActions().getContacts() 
+					return true
+				} else{
+					console.log("error occurred while adding your contact", response.statusText, response.status)
+					alert("error occured while creating your contact. Please try again later")
+					return false
+				}
+			},
+			editContact: () => {
 
-				//reset the global store
-				setStore({ demo: demo });
+			},
+			deleteContact: () => {
+
 			}
 		}
 	};
