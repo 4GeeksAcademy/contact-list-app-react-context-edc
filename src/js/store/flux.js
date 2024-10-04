@@ -62,10 +62,41 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false
 				}
 			},
-			editContact: () => {
+			editContact: async (contact) => {
+				let options = {
+					method: "PUT",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify(contact)
+				} 
+				try {
+					let response = await fetch(`${apiURL}/agendas/${slug}/contacts/` + contact.id, options)
+					if (response){
+						getActions().getContacts()
+						return true 
+					} else {
+						return false
+					}
+				} catch {
+					console.log (error)
+				}
 
 			},
-			deleteContact: () => {
+			deleteContact: async (contactId) => {
+				let options = {
+					method: "DELETE",
+					headers: {"Content-Type": "application/json"}
+				} 
+				try {
+					let response = await fetch(`${apiURL}/agendas/${slug}/contacts/` + contactId, options)
+					if (response){
+						getActions().getContacts()
+						return true 
+					} else {
+						return false
+					}
+				} catch {
+					console.log (error)
+				}
 
 			}
 		}
