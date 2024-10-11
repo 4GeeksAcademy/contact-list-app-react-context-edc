@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 export const AddContact = props => {
   const { store, actions } = useContext(Context);
   const [email, setEmail] = useState("")
+  let navigate = useNavigate()
   const [name, setName] = useState("")
   const [address, setAddress] = useState("")
   const [phone, setPhone] = useState("")
@@ -18,6 +19,11 @@ export const AddContact = props => {
     })
     if (success) {
       alert("Contact successfully added")
+      navigate("/")
+      setEmail("")
+      setAddress("")
+      setName("")
+      setPhone("")
     } else {
       alert("something went wrong")
     }
